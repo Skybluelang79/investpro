@@ -1,0 +1,54 @@
+<h1 class="page-title mb-2">User Management</h1>
+
+<div class="card mb-2">
+  <div class="admin-controls">
+    <input type="text" class="form-control" placeholder="Search users..." [(ngModel)]="searchTerm" />
+    <button class="btn btn-sm btn-outline" (click)="loadUsers()">Search</button>
+    <select class="form-control" [(ngModel)]="filterRole">
+      <option value="">All Users</option>
+      <option value="active">Active</option>
+      <option value="inactive">Inactive</option>
+    </select>
+  </div>
+</div>
+
+<div class="card">
+  <div *ngIf="!users" class="loading">Loading users...</div>
+  <table class="table" *ngIf="users">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Phone</th>
+        <th>KYC</th>
+        <th>Balance</th>
+        <th>Invested</th>
+        <th>Status</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let user of users.data">
+        <td><strong>{{ user.name }}</strong></td>
+        <td class="muted small">{{ user.email }}</td>
+        <td class="muted small">{{ user.phone || '-' }}</td>
+        <td>
+          <span class="badge" [ngClass]="'badge-' + (user.kyc?.status || 'pending')">
+            {{ user.kyc?.status || 'pending' }}
+          </span>
+        </td>
+        <td class="mono">{{ api.money(user.wallet?.balance || 0) }}</td>
+        <td class="mono">{{ api.money(user.total_invested || 0) }}</td>
+        <td>
+          <span class="badge" [ngClass]="user.is_active ? 'badge-active' : 'badge-inactive'">
+            {{ user.is_active ? 'Active' : 'Inactive' }}
+          </span>
+        </td>
+        <td>
+          <button class="btn btn-xs btn-outline" (click)="viewUser(user.id)">View</button>
+          <button class="btn btn-xs btn-outline" (click)="toggleStatus(user)">{{ user.is_active ? 'Deactivate' : 'Activate' }}</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

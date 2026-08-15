@@ -1,0 +1,70 @@
+<h1 class="page-title mb-2">My Profile</h1>
+
+<div class="card">
+  <h2 class="section-title mb-2">Profile Information</h2>
+  <div class="profile-form">
+    <div class="form-group">
+      <label>Full Name</label>
+      <input type="text" class="form-control" [(ngModel)]="profile.name" />
+    </div>
+
+    <div class="form-group">
+      <label>Email</label>
+      <input type="email" class="form-control" [(ngModel)]="profile.email" disabled />
+    </div>
+
+    <div class="form-group">
+      <label>Phone</label>
+      <input type="tel" class="form-control" [(ngModel)]="profile.phone" placeholder="+1 (555) 000-0000" />
+    </div>
+
+    <div class="form-group">
+      <label>Avatar</label>
+      <div class="avatar-upload">
+        <img *ngIf="profile.avatar" [src]="profile.avatar" class="avatar-preview" />
+        <input type="file" class="form-control" (change)="onAvatarSelect($event)" accept="image/*" />
+      </div>
+    </div>
+
+    <button class="btn btn-primary" (click)="updateProfile()">Save Changes</button>
+  </div>
+</div>
+
+<div class="card mt-2">
+  <h2 class="section-title mb-2">Change Password</h2>
+  <div class="form-group">
+    <label>Current Password</label>
+    <input type="password" class="form-control" [(ngModel)]="passwordForm.current_password" />
+  </div>
+
+  <div class="form-group">
+    <label>New Password</label>
+    <input type="password" class="form-control" [(ngModel)]="passwordForm.password" />
+  </div>
+
+  <div class="form-group">
+    <label>Confirm Password</label>
+    <input type="password" class="form-control" [(ngModel)]="passwordForm.password_confirmation" />
+  </div>
+
+  <button class="btn btn-primary" (click)="updatePassword()">Update Password</button>
+</div>
+
+<div class="card mt-2">
+  <h2 class="section-title mb-2">Referral Information</h2>
+  <div class="referral-box">
+    <div class="referral-item">
+      <div class="muted small">Your Referral Code</div>
+      <div class="referral-code mono">{{ profile.referral_code }}</div>
+      <button class="btn btn-sm btn-outline" (click)="copyReferralCode()">Copy Code</button>
+    </div>
+    <div class="referral-item">
+      <div class="muted small">Total Referrals</div>
+      <div class="referral-count mono">{{ profile.referrals_count }}</div>
+    </div>
+    <div class="referral-item">
+      <div class="muted small">Referral Bonus</div>
+      <div class="referral-bonus mono">{{ api.money(profile.referral_bonus_total) }}</div>
+    </div>
+  </div>
+</div>

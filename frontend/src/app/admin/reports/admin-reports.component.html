@@ -1,0 +1,71 @@
+<h1 class="page-title mb-2">Admin Reports</h1>
+
+<div class="grid-3 mb-2">
+  <div class="card metric-card">
+    <div class="metric-label">Total Users</div>
+    <div class="metric-value mono">{{ stats?.total_users || 0 }}</div>
+  </div>
+  <div class="card metric-card">
+    <div class="metric-label">Total Investment Value</div>
+    <div class="metric-value mono">{{ api.money(stats?.total_invested_value || 0) }}</div>
+  </div>
+  <div class="card metric-card">
+    <div class="metric-label">Platform Profit</div>
+    <div class="metric-value mono percent-up">{{ api.money(stats?.total_platform_profit || 0) }}</div>
+  </div>
+</div>
+
+<div class="grid-2">
+  <div class="card">
+    <h3 class="section-title mb-2">Investment Distribution by Plan</h3>
+    <div class="plan-distribution">
+      <div *ngFor="let plan of stats?.plan_distribution" class="plan-item">
+        <div class="plan-name">{{ plan.name }}</div>
+        <div class="plan-bar">
+          <div class="bar-fill" [style.width.%]="plan.percentage"></div>
+        </div>
+        <div class="plan-stats">
+          <span class="mono">{{ plan.count }} investments</span>
+          <span class="mono">{{ api.money(plan.total_amount) }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3 class="section-title mb-2">KYC Status</h3>
+    <div class="kyc-stats">
+      <div class="kyc-item">
+        <div class="status-dot verified"></div>
+        <div>
+          <div class="kyc-label">Verified</div>
+          <div class="kyc-count">{{ stats?.kyc_verified || 0 }}</div>
+        </div>
+      </div>
+      <div class="kyc-item">
+        <div class="status-dot pending"></div>
+        <div>
+          <div class="kyc-label">Pending</div>
+          <div class="kyc-count">{{ stats?.kyc_pending || 0 }}</div>
+        </div>
+      </div>
+      <div class="kyc-item">
+        <div class="status-dot rejected"></div>
+        <div>
+          <div class="kyc-label">Rejected</div>
+          <div class="kyc-count">{{ stats?.kyc_rejected || 0 }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card mt-2">
+  <h3 class="section-title mb-2">Export Reports</h3>
+  <div class="export-buttons">
+    <button class="btn btn-outline" (click)="exportUsers()">📥 Export Users</button>
+    <button class="btn btn-outline" (click)="exportTransactions()">📥 Export Transactions</button>
+    <button class="btn btn-outline" (click)="exportInvestments()">📥 Export Investments</button>
+    <button class="btn btn-outline" (click)="exportDeposits()">📥 Export Deposits</button>
+  </div>
+</div>

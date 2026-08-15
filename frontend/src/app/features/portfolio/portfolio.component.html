@@ -1,0 +1,51 @@
+<h1 class="page-title mb-2">My Portfolio</h1>
+
+<div *ngIf="!portfolio" class="loading">Loading portfolio...</div>
+
+<ng-container *ngIf="portfolio">
+  <div class="grid-3 mb-2">
+    <div class="card stat-card">
+      <div class="stat-label muted">Total Invested</div>
+      <div class="stat-value mono">{{ api.money(portfolio.total_invested) }}</div>
+    </div>
+    <div class="card stat-card">
+      <div class="stat-label muted">Current Value</div>
+      <div class="stat-value mono">{{ api.money(portfolio.current_value) }}</div>
+    </div>
+    <div class="card stat-card">
+      <div class="stat-label muted">Total Profit</div>
+      <div class="stat-value mono percent-up">+{{ api.money(portfolio.total_profit) }}</div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <h3 class="section-title mb-2">Portfolio Composition</h3>
+      <div class="composition-list">
+        <div *ngFor="let item of portfolio.by_plan" class="composition-item">
+          <div class="item-label">{{ item.plan_name }}</div>
+          <div class="item-bar">
+            <div class="bar-fill" [style.width.%]="item.percentage"></div>
+          </div>
+          <div class="item-value">{{ item.percentage.toFixed(1) }}% ({{ api.money(item.amount) }})</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 class="section-title mb-2">Performance</h3>
+      <div class="performance-metric">
+        <div class="metric-label">ROI</div>
+        <div class="metric-value" [class.positive]="portfolio.roi >= 0">{{ portfolio.roi.toFixed(2) }}%</div>
+      </div>
+      <div class="performance-metric">
+        <div class="metric-label">Avg Return/Day</div>
+        <div class="metric-value">{{ api.money(portfolio.avg_daily_return) }}</div>
+      </div>
+      <div class="performance-metric">
+        <div class="metric-label">Time Remaining</div>
+        <div class="metric-value">{{ portfolio.avg_days_remaining }} days</div>
+      </div>
+    </div>
+  </div>
+</ng-container>

@@ -1,0 +1,62 @@
+.wallet-card {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 1.5rem;
+
+  .muted {
+    opacity: 0.9;
+  }
+
+  .balance {
+    font-size: 2rem;
+    margin: 0.5rem 0;
+  }
+
+  &.bonus-card {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  }
+}
+
+.quick-actions {
+  display: flex;
+  gap: 1rem;
+
+  .btn {
+    flex: 1;
+  }
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+  }
+}
+
+.tx-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--border-color);
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  .tx-title {
+    font-weight: 500;
+    margin-bottom: 0.25rem;
+  }
+
+  .amount-positive {
+    color: #10b981;
+  }
+
+  .amount-negative {
+    color: #ef4444;
+  }
+}
+
+.empty {
+  text-align: center;
+  padding: 2rem;
+  color: var(--text-secondary);
+}

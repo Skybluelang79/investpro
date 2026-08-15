@@ -1,0 +1,46 @@
+<h1 class="page-title mb-2">KYC Verification Management</h1>
+
+<div class="card mb-2">
+  <div class="admin-controls">
+    <input type="text" class="form-control" placeholder="Search user..." [(ngModel)]="searchTerm" />
+    <select class="form-control" [(ngModel)]="selectedStatus">
+      <option value="">All Status</option>
+      <option value="pending">Pending</option>
+      <option value="approved">Approved</option>
+      <option value="rejected">Rejected</option>
+    </select>
+  </div>
+</div>
+
+<div class="card">
+  <div *ngIf="!kycs" class="loading">Loading KYC records...</div>
+  <table class="table" *ngIf="kycs">
+    <thead>
+      <tr>
+        <th>User</th>
+        <th>Document Type</th>
+        <th>Status</th>
+        <th>Submitted</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let kyc of kycs.data">
+        <td>
+          <div>{{ kyc.user?.name }}</div>
+          <div class="muted small">{{ kyc.user?.email }}</div>
+        </td>
+        <td>{{ kyc.document_type | titlecase }}</td>
+        <td>
+          <span class="badge" [ngClass]="'badge-' + kyc.status">{{ kyc.status }}</span>
+        </td>
+        <td class="small">{{ kyc.created_at | date: 'mediumDate' }}</td>
+        <td>
+          <button *ngIf="kyc.status === 'pending'" class="btn btn-xs btn-success" (click)="approve(kyc)">Approve</button>
+          <button *ngIf="kyc.status === 'pending'" class="btn btn-xs btn-danger" (click)="reject(kyc)">Reject</button>
+          <button class="btn btn-xs btn-outline" (click)="viewDocument(kyc)">View Doc</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

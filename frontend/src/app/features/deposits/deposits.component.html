@@ -1,0 +1,52 @@
+<h1 class="page-title mb-2">Deposits</h1>
+
+<div class="grid-2 mb-3">
+  <div class="card">
+    <h3 class="section-title mb-1">Quick Deposit</h3>
+    <div class="form-group">
+      <label>Amount</label>
+      <input type="number" class="form-control" [(ngModel)]="depositAmount" placeholder="Enter amount" min="100" />
+    </div>
+    <div class="form-group">
+      <label>Payment Method</label>
+      <select class="form-control" [(ngModel)]="paymentMethod">
+        <option value="bank">Bank Transfer</option>
+        <option value="card">Credit/Debit Card</option>
+        <option value="wallet">E-Wallet</option>
+      </select>
+    </div>
+    <button class="btn btn-primary btn-block" (click)="makeDeposit()">Deposit Now</button>
+  </div>
+
+  <div class="card">
+    <h3 class="section-title mb-1">Deposit Statistics</h3>
+    <div class="stat-item">
+      <div class="muted small">Total Deposited</div>
+      <div class="mono large">{{ api.money(stats?.total_deposited || 0) }}</div>
+    </div>
+    <div class="stat-item mt-1">
+      <div class="muted small">Pending Deposits</div>
+      <div class="mono large">{{ stats?.pending_count || 0 }}</div>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <h2 class="section-title mb-2">Deposit History</h2>
+  <div *ngIf="!deposits" class="loading">Loading deposits...</div>
+  <table class="table" *ngIf="deposits">
+    <thead>
+      <tr><th>Reference</th><th>Amount</th><th>Method</th><th>Status</th><th>Date</th></tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let deposit of deposits.data">
+        <td class="mono small">{{ deposit.reference }}</td>
+        <td class="mono">{{ api.money(deposit.amount) }}</td>
+        <td>{{ deposit.method }}</td>
+        <td><span class="badge" [ngClass]="'badge-' + badgeClass(deposit.status)">{{ deposit.status }}</span></td>
+        <td class="small">{{ deposit.created_at | date: 'mediumDate' }}</td>
+      </tr>
+    </tbody>
+  </table>
+  <div *ngIf="deposits && deposits.data.length === 0" class="empty">No deposits yet</div>
+</div>

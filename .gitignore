@@ -1,0 +1,36 @@
+# Environment
+.env
+.env.*
+!.env.example
+
+# Dependencies
+**/vendor/
+**/node_modules/
+
+# Build output
+**/dist/
+frontend/dist/
+backend/storage/logs/*
+
+# Framework files
+backend/storage/framework/cache/*
+backend/storage/framework/sessions/*
+backend/storage/framework/views/*
+backend/storage/framework/testing/*
+backend/storage/app/public/*
+!backend/storage/app/public/.gitignore
+
+# Cache
+.phpunit.cache/
+.phpunit.result.cache
+
+# Logs & temp
+*.log
+*.pid
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp

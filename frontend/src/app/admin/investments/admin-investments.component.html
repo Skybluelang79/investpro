@@ -1,0 +1,57 @@
+<h1 class="page-title mb-2">Investment Monitoring</h1>
+
+<div class="card mb-2">
+  <div class="admin-controls">
+    <input type="text" class="form-control" placeholder="Search reference..." [(ngModel)]="searchRef" />
+    <select class="form-control" [(ngModel)]="selectedPlan">
+      <option value="">All Plans</option>
+      <option *ngFor="let plan of plans" [value]="plan.id">{{ plan.name }}</option>
+    </select>
+    <select class="form-control" [(ngModel)]="selectedStatus">
+      <option value="">All Status</option>
+      <option value="active">Active</option>
+      <option value="completed">Completed</option>
+      <option value="rejected">Rejected</option>
+    </select>
+  </div>
+</div>
+
+<div class="card">
+  <div *ngIf="!investments" class="loading">Loading investments...</div>
+  <table class="table" *ngIf="investments">
+    <thead>
+      <tr>
+        <th>Reference</th>
+        <th>User</th>
+        <th>Plan</th>
+        <th>Amount</th>
+        <th>Current Value</th>
+        <th>Profit</th>
+        <th>Status</th>
+        <th>Ends</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let inv of investments.data">
+        <td class="mono small">{{ inv.reference }}</td>
+        <td>
+          <div>{{ inv.user?.name }}</div>
+          <div class="muted small">{{ inv.user?.email }}</div>
+        </td>
+        <td>{{ inv.plan?.name }}</td>
+        <td class="mono">{{ api.money(inv.amount) }}</td>
+        <td class="mono">{{ api.money(inv.current_value) }}</td>
+        <td class="mono percent-up">+{{ api.money(inv.total_profit) }}</td>
+        <td>
+          <span class="badge" [ngClass]="'badge-' + inv.status">{{ inv.status }}</span>
+        </td>
+        <td class="small">{{ inv.ends_at ? (inv.ends_at | date: 'mediumDate') : '-' }}</td>
+        <td>
+          <button class="btn btn-xs btn-outline" (click)="viewDetails(inv)">Details</button>
+          <button class="btn btn-xs btn-outline" (click)="editProfit(inv)">Edit</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

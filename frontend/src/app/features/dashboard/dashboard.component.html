@@ -1,0 +1,81 @@
+<h1 class="page-title mb-2">Dashboard</h1>
+
+<div *ngIf="!data" class="loading">Loading dashboard...</div>
+
+<ng-container *ngIf="data">
+  <div class="grid-2">
+    <div class="card balance-card">
+      <div class="muted small">Total Balance</div>
+      <div class="balance mono">{{ api.money(data.total_balance) }}</div>
+      <div [class]="data.monthly_growth >= 0 ? 'percent-up' : 'percent-down'">
+        {{ data.monthly_growth >= 0 ? '+' : '' }}{{ data.monthly_growth.toFixed(2) }}% this month
+      </div>
+    </div>
+    <div class="card">
+      <div class="muted small mb-1">Portfolio Performance</div>
+      <svg viewBox="0 0 300 120" class="sparkline" preserveAspectRatio="none">
+        <defs>
+          <linearGradient id="area" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#6366f1" stop-opacity="0.35"/>
+            <stop offset="100%" stop-color="#6366f1" stop-opacity="0"/>
+          </linearGradient>
+        </defs>
+        <path [attr.d]="areaPath" fill="url(#area)"/>
+        <path [attr.d]="linePath" fill="none" stroke="#6366f1" stroke-width="2.5" stroke-linecap="round"/>
+      </svg>
+      <div class="chart-labels">
+        <span *ngFor="let point of data.chart" class="muted small">{{ point.month }}</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-4 mt-2">
+    <div class="card stat">
+      <div class="stat-label muted">Invested</div>
+      <div class="stat-value mono">{{ api.money(data.active_invested) }}</div>
+    </div>
+    <div class="card stat">
+      <div class="stat-label muted">Profit</div>
+      <div class="stat-value mono">{{ api.money(data.total_profit) }}</div>
+    </div>
+    <div class="card stat">
+      <div class="stat-label muted">Available</div>
+      <div class="stat-value mono">{{ api.money(data.wallet_balance) }}</div>
+    </div>
+    <div class="card stat">
+      <div class="stat-label muted">Bonus Balance</div>
+      <div class="stat-value mono">{{ api.money(data.bonus_balance) }}</div>
+    </div>
+  </div>
+
+  <div class="grid-2 mt-2">
+    <div class="card">
+      <h3 class="section-title mb-2">Active Investments</h3>
+      <div *ngIf="data.active_investments.length === 0" class="empty">No active investments</div>
+      <div *ngFor="let inv of data.active_investments" class="investment-item">
+        <div>
+          <div class="muted small">{{ inv.plan?.name }}</div>
+          <div class="mono">{{ api.money(inv.amount) }}</div>
+        </div>
+        <div class="text-right">
+          <div class="muted small">{{ inv.daily_profit ? '+' : '' }}{{ api.money(inv.daily_profit) }}/day</div>
+          <div class="mono">{{ inv.ends_at ? (inv.ends_at | date: 'mediumDate') : '-' }}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 class="section-title mb-2">Recent Transactions</h3>
+      <div *ngIf="data.recent_transactions.length === 0" class="empty">No transactions</div>
+      <div *ngFor="let tx of data.recent_transactions" class="tx-row">
+        <div>
+          <div class="tx-title">{{ tx.description ?? tx.type }}</div>
+          <div class="muted small">{{ tx.created_at | date: 'medium' }}</div>
+        </div>
+        <div [class.amount-positive]="tx.amount > 0" [class.amount-negative]="tx.amount < 0" class="mono">
+          {{ tx.amount > 0 ? '+' : '' }}{{ api.money(tx.amount) }}
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-container>

@@ -1,0 +1,19 @@
+<h1 class="page-title mb-2">Notifications</h1>
+
+<div class="notification-controls mb-2">
+  <button class="btn btn-sm" [class.active]="filter === 'all'" (click)="filter = 'all'">All</button>
+  <button class="btn btn-sm" [class.active]="filter === 'unread'" (click)="filter = 'unread'">Unread ({{ unreadCount }})</button>
+</div>
+
+<div class="card">
+  <div *ngIf="!notifications" class="loading">Loading notifications...</div>
+  <div *ngIf="notifications && notifications.length === 0" class="empty">No notifications</div>
+  <div *ngFor="let notif of filteredNotifications" class="notification-item" [class.unread]="!notif.read_at">
+    <div class="notif-head">
+      <h4 class="notif-title">{{ notif.title }}</h4>
+      <span class="notif-date">{{ notif.created_at | date: 'short' }}</span>
+    </div>
+    <p class="notif-message">{{ notif.message }}</p>
+    <button *ngIf="!notif.read_at" class="btn btn-sm btn-outline" (click)="markAsRead(notif.id)">Mark as read</button>
+  </div>
+</div>

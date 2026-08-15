@@ -1,0 +1,51 @@
+<h1 class="page-title mb-2">Withdrawals</h1>
+
+<div class="grid-2 mb-3">
+  <div class="card">
+    <h3 class="section-title mb-1">Request Withdrawal</h3>
+    <div class="form-group">
+      <label>Amount</label>
+      <input type="number" class="form-control" [(ngModel)]="withdrawalAmount" placeholder="Enter amount" />
+      <div class="muted small mt-1">Available: {{ api.money(availableBalance || 0) }}</div>
+    </div>
+    <div class="form-group">
+      <label>Bank Account</label>
+      <select class="form-control" [(ngModel)]="selectedAccount">
+        <option *ngFor="let acc of bankAccounts" [value]="acc.id">{{ acc.bank_name }} - {{ acc.account_number }}</option>
+      </select>
+    </div>
+    <button class="btn btn-primary btn-block" (click)="requestWithdrawal()">Request Withdrawal</button>
+  </div>
+
+  <div class="card">
+    <h3 class="section-title mb-1">Withdrawal Statistics</h3>
+    <div class="stat-item">
+      <div class="muted small">Total Withdrawn</div>
+      <div class="mono large">{{ api.money(stats?.total_withdrawn || 0) }}</div>
+    </div>
+    <div class="stat-item mt-1">
+      <div class="muted small">Pending Withdrawals</div>
+      <div class="mono large">{{ stats?.pending_count || 0 }}</div>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <h2 class="section-title mb-2">Withdrawal History</h2>
+  <div *ngIf="!withdrawals" class="loading">Loading withdrawals...</div>
+  <table class="table" *ngIf="withdrawals">
+    <thead>
+      <tr><th>Reference</th><th>Amount</th><th>Bank</th><th>Status</th><th>Date</th></tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let withdrawal of withdrawals.data">
+        <td class="mono small">{{ withdrawal.reference }}</td>
+        <td class="mono">{{ api.money(withdrawal.amount) }}</td>
+        <td>{{ withdrawal.bank_name }}</td>
+        <td><span class="badge" [ngClass]="'badge-' + badgeClass(withdrawal.status)">{{ withdrawal.status }}</span></td>
+        <td class="small">{{ withdrawal.created_at | date: 'mediumDate' }}</td>
+      </tr>
+    </tbody>
+  </table>
+  <div *ngIf="withdrawals && withdrawals.data.length === 0" class="empty">No withdrawals yet</div>
+</div>

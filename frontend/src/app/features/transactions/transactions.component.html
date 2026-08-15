@@ -1,0 +1,36 @@
+<h1 class="page-title mb-2">Transactions</h1>
+
+<div class="card mb-2">
+  <div class="filter-controls">
+    <input type="text" class="form-control" placeholder="Search reference..." [(ngModel)]="searchRef" />
+    <select class="form-control" [(ngModel)]="selectedType">
+      <option value="">All Types</option>
+      <option value="deposit">Deposits</option>
+      <option value="withdrawal">Withdrawals</option>
+      <option value="investment">Investments</option>
+      <option value="profit">Profits</option>
+      <option value="bonus">Bonuses</option>
+    </select>
+  </div>
+</div>
+
+<div class="card">
+  <div *ngIf="!transactions" class="loading">Loading transactions...</div>
+  <table class="table" *ngIf="transactions">
+    <thead>
+      <tr><th>Reference</th><th>Type</th><th>Description</th><th>Amount</th><th>Date</th></tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let tx of transactions.data">
+        <td class="mono small">{{ tx.reference }}</td>
+        <td><span class="badge" [ngClass]="'badge-' + tx.type">{{ tx.type }}</span></td>
+        <td>{{ tx.description }}</td>
+        <td [class.amount-positive]="tx.amount > 0" [class.amount-negative]="tx.amount < 0" class="mono">
+          {{ tx.amount > 0 ? '+' : '' }}{{ api.money(tx.amount) }}
+        </td>
+        <td class="small">{{ tx.created_at | date: 'medium' }}</td>
+      </tr>
+    </tbody>
+  </table>
+  <div *ngIf="transactions && transactions.data.length === 0" class="empty">No transactions found</div>
+</div>

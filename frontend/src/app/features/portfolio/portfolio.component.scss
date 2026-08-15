@@ -1,0 +1,77 @@
+.stat-card {
+  background: white;
+  text-align: center;
+
+  .stat-label {
+    font-size: 0.875rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .stat-value {
+    font-size: 1.75rem;
+    font-weight: 600;
+
+    &.percent-up {
+      color: #10b981;
+    }
+  }
+}
+
+.composition-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.composition-item {
+  .item-label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    margin-bottom: 0.25rem;
+  }
+
+  .item-bar {
+    height: 8px;
+    background: var(--border-color);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 0.25rem;
+
+    .bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #667eea, #764ba2);
+      border-radius: 4px;
+      transition: width 0.3s ease;
+    }
+  }
+
+  .item-value {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+  }
+}
+
+.performance-metric {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--border-color);
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  .metric-label {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+  }
+
+  .metric-value {
+    font-weight: 600;
+    font-size: 1rem;
+
+    &.positive {
+      color: #10b981;
+    }
+  }
+}

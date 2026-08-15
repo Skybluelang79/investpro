@@ -1,0 +1,90 @@
+.filter-controls {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+
+  .form-control {
+    padding: 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    font-size: 0.875rem;
+
+    &:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+  }
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+
+  th {
+    padding: 0.75rem;
+    text-align: left;
+    border-bottom: 2px solid var(--border-color);
+    font-weight: 600;
+    font-size: 0.875rem;
+  }
+
+  td {
+    padding: 0.75rem;
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  tr:hover {
+    background-color: var(--bg-secondary);
+  }
+}
+
+.badge {
+  padding: 0.375rem 0.75rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+
+  &.badge-deposit {
+    background: #dbeafe;
+    color: #0c4a6e;
+  }
+
+  &.badge-withdrawal {
+    background: #fee2e2;
+    color: #991b1b;
+  }
+
+  &.badge-investment {
+    background: #fef3c7;
+    color: #92400e;
+  }
+
+  &.badge-profit {
+    background: #d1fae5;
+    color: #065f46;
+  }
+
+  &.badge-bonus {
+    background: #f3e8ff;
+    color: #6b21a8;
+  }
+}
+
+.amount-positive {
+  color: #10b981;
+}
+
+.amount-negative {
+  color: #ef4444;
+}
+
+.empty {
+  text-align: center;
+  padding: 2rem;
+  color: var(--text-secondary);
+}

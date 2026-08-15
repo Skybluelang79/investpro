@@ -1,0 +1,46 @@
+<h1 class="page-title mb-2">KYC Verification</h1>
+
+<div class="card" *ngIf="kycStatus">
+  <div class="kyc-status" [class]="'status-' + kycStatus.status">
+    <h3>Verification Status: <span class="status-badge">{{ kycStatus.status | uppercase }}</span></h3>
+    <p *ngIf="kycStatus.status === 'pending'" class="muted">Your KYC is being reviewed. Please wait for approval.</p>
+    <p *ngIf="kycStatus.status === 'approved'" class="muted">Your identity has been verified. You can now access all features.</p>
+    <p *ngIf="kycStatus.status === 'rejected'" class="muted">Your KYC was rejected. Please submit again with correct information.</p>
+  </div>
+</div>
+
+<div class="card mt-2" *ngIf="!kycStatus || kycStatus.status === 'rejected'">
+  <h2 class="section-title mb-2">Submit KYC Documents</h2>
+  <form (ngSubmit)="submitKyc()">
+    <div class="form-group">
+      <label>Full Name</label>
+      <input type="text" class="form-control" [(ngModel)]="kycForm.full_name" name="full_name" required />
+    </div>
+
+    <div class="form-group">
+      <label>Date of Birth</label>
+      <input type="date" class="form-control" [(ngModel)]="kycForm.date_of_birth" name="dob" required />
+    </div>
+
+    <div class="form-group">
+      <label>Document Type</label>
+      <select class="form-control" [(ngModel)]="kycForm.document_type" name="doc_type" required>
+        <option value="passport">Passport</option>
+        <option value="driving_license">Driving License</option>
+        <option value="national_id">National ID</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>Document Number</label>
+      <input type="text" class="form-control" [(ngModel)]="kycForm.document_number" name="doc_number" required />
+    </div>
+
+    <div class="form-group">
+      <label>Document Image</label>
+      <input type="file" class="form-control" (change)="onDocumentSelect($event)" accept="image/*" />
+    </div>
+
+    <button type="submit" class="btn btn-primary btn-block">Submit for Verification</button>
+  </form>
+</div>

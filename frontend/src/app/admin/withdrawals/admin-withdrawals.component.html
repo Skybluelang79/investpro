@@ -1,0 +1,51 @@
+<h1 class="page-title mb-2">Manage Withdrawals</h1>
+
+<div class="card mb-2">
+  <div class="admin-controls">
+    <input type="text" class="form-control" placeholder="Search reference..." [(ngModel)]="searchRef" />
+    <select class="form-control" [(ngModel)]="selectedStatus">
+      <option value="">All Status</option>
+      <option value="pending">Pending</option>
+      <option value="approved">Approved</option>
+      <option value="rejected">Rejected</option>
+      <option value="completed">Completed</option>
+    </select>
+  </div>
+</div>
+
+<div class="card">
+  <div *ngIf="!withdrawals" class="loading">Loading withdrawals...</div>
+  <table class="table" *ngIf="withdrawals">
+    <thead>
+      <tr>
+        <th>Reference</th>
+        <th>User</th>
+        <th>Amount</th>
+        <th>Bank</th>
+        <th>Status</th>
+        <th>Date</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let withdrawal of withdrawals.data">
+        <td class="mono small">{{ withdrawal.reference }}</td>
+        <td>
+          <div>{{ withdrawal.user?.name }}</div>
+          <div class="muted small">{{ withdrawal.user?.email }}</div>
+        </td>
+        <td class="mono">{{ api.money(withdrawal.amount) }}</td>
+        <td class="small">{{ withdrawal.bank_name }}</td>
+        <td>
+          <span class="badge" [ngClass]="'badge-' + withdrawal.status">{{ withdrawal.status }}</span>
+        </td>
+        <td class="small">{{ withdrawal.created_at | date: 'mediumDate' }}</td>
+        <td>
+          <button *ngIf="withdrawal.status === 'pending'" class="btn btn-xs btn-success" (click)="approve(withdrawal)">Approve</button>
+          <button *ngIf="withdrawal.status === 'pending'" class="btn btn-xs btn-danger" (click)="reject(withdrawal)">Reject</button>
+          <button class="btn btn-xs btn-outline" (click)="viewDetails(withdrawal)">Details</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
