@@ -5,6 +5,10 @@ import { AuthService } from '../../core/services/auth.service';
 import { ApiService } from '../../core/services/api.service';
 import { NotificationItem } from '../../core/models';
 import { ToastsComponent } from '../components/toasts.component';
+import { ThemeToggleComponent } from '../components/theme-toggle.component';
+import { SupportWidgetComponent } from '../components/support-widget.component';
+import { AnnouncementBarComponent } from '../components/announcement-bar.component';
+import { LanguageSelectorComponent } from '../components/language-selector.component';
 
 interface NavItem {
   label: string;
@@ -15,7 +19,7 @@ interface NavItem {
 @Component({
   selector: 'app-layout',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive, ToastsComponent],
+  imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive, ToastsComponent, ThemeToggleComponent, SupportWidgetComponent, AnnouncementBarComponent, LanguageSelectorComponent],
   template: `
     <div class="shell">
       <aside class="sidebar">
@@ -45,6 +49,8 @@ interface NavItem {
         <header class="header">
           <button class="icon-btn" (click)="sidebarOpen = !sidebarOpen">&#9776;</button>
           <div class="header-spacer"></div>
+          <app-language-selector />
+          <app-theme-toggle />
           <button class="icon-btn" (click)="goNotifications()" title="Notifications">
             &#128276;<span *ngIf="unread > 0" class="unread-dot">{{ unread > 9 ? '9+' : unread }}</span>
           </button>
@@ -62,6 +68,7 @@ interface NavItem {
         </main>
       </div>
     </div>
+    <app-support-widget />
     <app-toasts />
   `,
   styles: [`
@@ -139,11 +146,15 @@ export class LayoutComponent {
   navItems: NavItem[] = [
     { label: 'Dashboard', route: '/dashboard', icon: '&#9639;' },
     { label: 'Portfolio', route: '/portfolio', icon: '&#9638;' },
+    { label: 'Plans', route: '/plans', icon: '&#9733;' },
     { label: 'Investments', route: '/investments', icon: '&#9650;' },
     { label: 'Wallet', route: '/wallet', icon: '&#128176;' },
     { label: 'Deposit', route: '/deposits', icon: '&#10133;' },
     { label: 'Transactions', route: '/transactions', icon: '&#8646;' },
     { label: 'Withdraw', route: '/withdrawals', icon: '&#10134;' },
+    { label: 'Referrals', route: '/referrals', icon: '&#128101;' },
+    { label: 'Activity', route: '/activity', icon: '&#128200;' },
+    { label: 'Security', route: '/security', icon: '&#128274;' },
     { label: 'Notifications', route: '/notifications', icon: '&#128276;' },
     { label: 'KYC', route: '/kyc', icon: '&#10003;' },
     { label: 'Profile', route: '/profile', icon: '&#9679;' },

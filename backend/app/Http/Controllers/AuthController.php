@@ -8,10 +8,13 @@ use App\Services\WalletService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use App\Traits\LogsActivity;
 use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
+    use LogsActivity;
+
     private const REFERRAL_BONUS = 10;
     private const NEW_USER_REFERRAL_BONUS = 5;
 
@@ -111,6 +114,8 @@ class AuthController extends Controller
 
         $token = $user->createToken('auth')->plainTextToken;
 
+        $this->logActivity('login', 'User logged in', null, $user->id);
+
         return response()->json([
             'message' => 'Logged in successfully.',
             'token' => $token,
@@ -120,6 +125,8 @@ class AuthController extends Controller
 
     public function logout(Request $request): JsonResponse
     {
+        $this->logActivity('logout', 'User logged out');
+
         $request->user()->currentAccessToken()->delete();
 
         return response()->json(['message' => 'Logged out.']);

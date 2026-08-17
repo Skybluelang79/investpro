@@ -14,7 +14,7 @@ return new class extends Migration
             $table->string('reference', 32)->unique();
             $table->decimal('amount', 15, 2);
             $table->string('method');
-            $table->json('account_details')->nullable();
+            $table->text('account_details')->nullable();
             $table->enum('status', ['pending', 'completed', 'failed'])->default('pending');
             $table->string('admin_note')->nullable();
             $table->timestamp('completed_at')->nullable();

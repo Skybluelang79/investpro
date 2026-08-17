@@ -1,6 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { ApiService } from '../../core/services/api.service';
 import { ToastService } from '../../core/services/toast.service';
 import { User } from '../../core/models';
@@ -10,68 +11,108 @@ import { User } from '../../core/models';
   standalone: true,
   imports: [CommonModule, FormsModule],
   template: `
-    <div class="page-head mb-2">
-      <h1 class="page-title">Users</h1>
-      <input class="input search" type="text" placeholder="Search name or email" [(ngModel)]="search" (input)="load()" />
+    <h1 class="page-title mb-2">User Management</h1>
+
+    <div class="card mb-2">
+      <div class="admin-controls">
+        <input type="text" class="form-control" placeholder="Search users..." [(ngModel)]="searchTerm" (input)="loadUsers()" />
+        <button class="btn btn-sm btn-outline" (click)="loadUsers()">Search</button>
+        <select class="form-control" [(ngModel)]="filterRole">
+          <option value="">All Users</option>
+          <option value="active">Active</option>
+          <option value="inactive">Inactive</option>
+        </select>
+      </div>
     </div>
 
     <div class="card">
       <table class="table">
         <thead>
-          <tr><th>User</th><th>Balance</th><th>Bonus</th><th>Referrals</th><th>KYC</th><th>Status</th><th>Joined</th><th>Actions</th></tr>
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>KYC</th>
+            <th>Balance</th>
+            <th>Invested</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let u of users">
+          <tr *ngFor="let u of filteredUsers">
             <td>
               <div class="cell-user">
                 <span class="avatar">{{ initials(u.name) }}</span>
                 <div>
                   <div>{{ u.name }}</div>
-                  <div class="muted small">{{ u.email }}</div>
                 </div>
               </div>
             </td>
-            <td class="mono">{{ api.money(u.wallet?.balance) }}</td>
-            <td class="mono">{{ api.money(u.referral_bonus_total ?? 0) }}</td>
-            <td>{{ u.referrals_count ?? 0 }}</td>
-            <td><span class="badge" [ngClass]="'badge-' + kycClass(u.kyc?.status)">{{ u.kyc?.status ?? 'none' }}</span></td>
-            <td><span class="badge" [ngClass]="u.is_active ? 'badge-success' : 'badge-danger'">{{ u.is_active ? 'active' : 'banned' }}</span></td>
-            <td class="small">{{ u.created_at | date: 'mediumDate' }}</td>
+            <td class="muted small">{{ u.email }}</td>
+            <td class="muted small">{{ u.phone || '-' }}</td>
             <td>
-              <button class="btn btn-outline btn-sm" (click)="toggle(u)">
-                {{ u.is_active ? 'Suspend' : 'Restore' }}
-              </button>
+              <span class="badge" [ngClass]="'badge-' + kycClass(u.kyc?.status)">{{ u.kyc?.status ?? 'pending' }}</span>
+            </td>
+            <td class="mono">{{ api.money(u.wallet?.balance ?? 0) }}</td>
+            <td class="mono">{{ api.money(u.total_invested ?? 0) }}</td>
+            <td>
+              <span class="badge" [ngClass]="u.is_active ? 'badge-success' : 'badge-danger'">{{ u.is_active ? 'Active' : 'Inactive' }}</span>
+            </td>
+            <td>
+              <button class="btn btn-xs btn-outline" (click)="viewUser(u.id)">View</button>
+              <button class="btn btn-xs btn-outline" (click)="toggleStatus(u)">{{ u.is_active ? 'Deactivate' : 'Activate' }}</button>
             </td>
           </tr>
-          <tr *ngIf="users.length === 0"><td colspan="8" class="empty">No users found.</td></tr>
+          <tr *ngIf="filteredUsers.length === 0"><td colspan="8" class="empty">No users found.</td></tr>
         </tbody>
       </table>
     </div>
   `,
   styles: [`
-    .page-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
     .page-title { font-size: 20px; font-weight: 800; }
-    .search { max-width: 260px; }
+    .admin-controls { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+    .form-control { max-width: 260px; }
     .cell-user { display: flex; align-items: center; gap: 10px; }
   `],
 })
 export class AdminUsersComponent {
   api = inject(ApiService);
   private toast = inject(ToastService);
+  private router = inject(Router);
 
   users: User[] = [];
-  search = '';
+  searchTerm = '';
+  filterRole = '';
 
   ngOnInit(): void {
+    this.loadUsers();
+  }
+
+  loadUsers(): void {
     this.load();
   }
 
   load(): void {
-    this.api.get<{ data: User[] }>('/admin/users', { search: this.search }).subscribe((res) => (this.users = res.data));
+    this.api.get<{ data: User[] }>('/admin/users', { search: this.searchTerm }).subscribe((res) => (this.users = res.data));
+  }
+
+  get filteredUsers(): User[] {
+    if (!this.filterRole) return this.users;
+    const isActive = this.filterRole === 'active';
+    return this.users.filter((u) => u.is_active === isActive);
+  }
+
+  viewUser(id: number): void {
+    this.router.navigate(['/admin/users', id]);
+  }
+
+  toggleStatus(u: User): void {
+    this.toggle(u);
   }
 
   toggle(u: User): void {
-    this.api.post(`/admin/users/${u.id}/toggle-active`).subscribe({
+    this.api.post<{ message: string }>(`/admin/users/${u.id}/toggle-active`).subscribe({
       next: (res: { message: string }) => {
         this.toast.success(res.message);
         this.load();

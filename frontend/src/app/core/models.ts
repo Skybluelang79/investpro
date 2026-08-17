@@ -8,6 +8,7 @@ export interface Wallet {
 export interface Kyc {
   id: number;
   user_id: number;
+  user?: Pick<User, 'id' | 'name' | 'email'>;
   document_type: string;
   document_number?: string | null;
   document_front?: string | null;
@@ -15,6 +16,7 @@ export interface Kyc {
   status: 'pending' | 'approved' | 'rejected';
   rejection_reason?: string | null;
   verified_at?: string | null;
+  created_at?: string;
 }
 
 export interface User {
@@ -30,6 +32,8 @@ export interface User {
   kyc?: Kyc | null;
   referrals_count?: number;
   referral_bonus_total?: number;
+  total_invested?: number;
+  two_factor_enabled?: boolean;
   created_at?: string;
 }
 

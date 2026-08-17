@@ -66,6 +66,7 @@
         "test": {
           "builder": "@angular-devkit/build-angular:karma",
           "options": {
+            "karmaConfig": "karma.conf.js",
             "polyfills": ["zone.js", "zone.js/testing"],
             "tsConfig": "tsconfig.spec.json",
             "assets": ["src/favicon.ico", "src/assets"],
@@ -75,5 +76,8 @@
         }
       }
     }
+  },
+  "cli": {
+    "analytics": "d0a5119c-e57b-4688-86bd-d64ff93ff30b"
   }
 }

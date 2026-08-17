@@ -31,6 +31,7 @@ class User extends Authenticatable
         'referral_code',
         'referred_by',
         'email_verified_at',
+        'google_id',
     ];
 
     protected $hidden = [

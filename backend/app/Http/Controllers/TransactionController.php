@@ -36,7 +36,7 @@ class TransactionController extends Controller
                 } elseif ($to) {
                     $query->where('created_at', '<=', $to);
                 }
-            } catch (\\Exception $e) {
+            } catch (\Exception $e) {
                 // ignore invalid date formats and proceed without date filter
             }
         }

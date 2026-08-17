@@ -3,6 +3,10 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\{
     AuthController,
+    ActivityLogController,
+    AnnouncementController,
+    EmailVerificationController,
+    PasswordResetController,
     PlanController,
     InvestmentController,
     WalletController,
@@ -13,6 +17,9 @@ use App\Http\Controllers\{
     KycController,
     ProfileController,
     DashboardController,
+    PaymentController,
+    SocialAuthController,
+    TwoFactorController,
 };
 
 /*
@@ -28,6 +35,30 @@ Route::prefix('v1')->group(function () {
     Route::post('register', [AuthController::class, 'register'])->middleware('throttle:auth');
     Route::post('login', [AuthController::class, 'login'])->middleware('throttle:auth');
 
+    // Announcements (public)
+    Route::get('announcements', [AnnouncementController::class, 'index']);
+
+    // Advertisements (public)
+    Route::get('advertisements', [\App\Http\Controllers\AdvertisementController::class, 'index']);
+    Route::post('advertisements/{ad}/click', [\App\Http\Controllers\AdvertisementController::class, 'trackClick']);
+
+    // Google OAuth
+    Route::get('auth/google/redirect', [SocialAuthController::class, 'redirect']);
+    Route::get('auth/google/callback', [SocialAuthController::class, 'callback']);
+
+    // Email Verification
+    Route::post('email/verification/send', [EmailVerificationController::class, 'sendVerification'])->middleware('throttle:5,1');
+    Route::post('email/verification/verify', [EmailVerificationController::class, 'verifyEmail']);
+    Route::post('email/verification/resend', [EmailVerificationController::class, 'resendVerification'])->middleware('throttle:5,1');
+
+    // Two-Factor Authentication (public - used during login flow)
+    Route::post('2fa/verify', [TwoFactorController::class, 'verify']);
+
+    // Password Reset
+    Route::post('forgot-password', [PasswordResetController::class, 'sendResetLink'])->middleware('throttle:5,1');
+    Route::post('verify-reset-code', [PasswordResetController::class, 'verifyResetCode']);
+    Route::post('reset-password', [PasswordResetController::class, 'resetPassword']);
+
     Route::middleware('auth:sanctum')->group(function () {
 
         Route::post('logout', [AuthController::class, 'logout']);
@@ -41,6 +72,11 @@ Route::prefix('v1')->group(function () {
         Route::put('profile', [ProfileController::class, 'update']);
         Route::put('profile/password', [ProfileController::class, 'updatePassword']);
         Route::post('profile/avatar', [ProfileController::class, 'uploadAvatar']);
+
+        // Two-Factor Authentication
+        Route::post('2fa/enable', [TwoFactorController::class, 'enable']);
+        Route::post('2fa/disable', [TwoFactorController::class, 'disable']);
+        Route::get('2fa/secret', [TwoFactorController::class, 'getSecret']);
 
         // Investments
         Route::get('investments', [InvestmentController::class, 'index']);
@@ -74,6 +110,14 @@ Route::prefix('v1')->group(function () {
         Route::get('kyc', [KycController::class, 'show']);
         Route::post('kyc', [KycController::class, 'store']);
 
+        // Payments
+        Route::post('payments/create', [PaymentController::class, 'createPayment']);
+        Route::post('payments/verify', [PaymentController::class, 'verifyPayment']);
+
+        // Activity Log
+        Route::get('activity/stats', [ActivityLogController::class, 'stats']);
+        Route::get('activity', [ActivityLogController::class, 'index']);
+
         // Admin
         Route::prefix('admin')->middleware(['admin', 'audit.admin'])->group(function () {
             Route::get('dashboard', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'index']);
@@ -105,8 +149,32 @@ Route::prefix('v1')->group(function () {
             Route::get('kyc', [\App\Http\Controllers\Admin\AdminKycController::class, 'index']);
             Route::post('kyc/{kyc}/approve', [\App\Http\Controllers\Admin\AdminKycController::class, 'approve']);
             Route::post('kyc/{kyc}/reject', [\App\Http\Controllers\Admin\AdminKycController::class, 'reject']);
+
+            // Exports
+            Route::get('export/users', [\App\Http\Controllers\Admin\ExportController::class, 'exportUsers']);
+            Route::get('export/transactions', [\App\Http\Controllers\Admin\ExportController::class, 'exportTransactions']);
+            Route::get('export/investments', [\App\Http\Controllers\Admin\ExportController::class, 'exportInvestments']);
+            Route::get('export/deposits', [\App\Http\Controllers\Admin\ExportController::class, 'exportDeposits']);
+
+            // Announcements
+            Route::get('announcements', [\App\Http\Controllers\Admin\AdminAnnouncementController::class, 'index']);
+            Route::post('announcements', [\App\Http\Controllers\Admin\AdminAnnouncementController::class, 'store']);
+            Route::put('announcements/{announcement}', [\App\Http\Controllers\Admin\AdminAnnouncementController::class, 'update']);
+            Route::delete('announcements/{announcement}', [\App\Http\Controllers\Admin\AdminAnnouncementController::class, 'destroy']);
+            Route::post('announcements/{announcement}/toggle-active', [\App\Http\Controllers\Admin\AdminAnnouncementController::class, 'toggleActive']);
+
+            // Advertisements
+            Route::get('advertisements', [\App\Http\Controllers\Admin\AdminAdvertisementController::class, 'index']);
+            Route::post('advertisements', [\App\Http\Controllers\Admin\AdminAdvertisementController::class, 'store']);
+            Route::put('advertisements/{advertisement}', [\App\Http\Controllers\Admin\AdminAdvertisementController::class, 'update']);
+            Route::delete('advertisements/{advertisement}', [\App\Http\Controllers\Admin\AdminAdvertisementController::class, 'destroy']);
+            Route::post('advertisements/{advertisement}/toggle-active', [\App\Http\Controllers\Admin\AdminAdvertisementController::class, 'toggleActive']);
+            Route::get('advertisements/{advertisement}/stats', [\App\Http\Controllers\Admin\AdminAdvertisementController::class, 'stats']);
         });
 
     });
+
+    // Webhook (public - no auth)
+    Route::post('payments/webhook', [PaymentController::class, 'webhook']);
 
 });

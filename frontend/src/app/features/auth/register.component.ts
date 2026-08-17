@@ -53,6 +53,9 @@ import { ToastService } from '../../core/services/toast.service';
         <p class="muted small mt-2">
           Already registered? <a routerLink="/auth/login" class="link">Sign in</a>
         </p>
+        <p class="muted small">
+          <a routerLink="/" class="link">&larr; Back to home</a>
+        </p>
       </form>
     </div>
   `,

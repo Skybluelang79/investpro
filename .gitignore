@@ -12,6 +12,9 @@
 frontend/dist/
 backend/storage/logs/*
 
+# Angular
+frontend/.angular/
+
 # Framework files
 backend/storage/framework/cache/*
 backend/storage/framework/sessions/*

@@ -14,7 +14,7 @@ return new class extends Migration
             $table->string('reference', 32)->unique();
             $table->decimal('amount', 15, 2);
             $table->string('method');
-            $table->json('account_details');
+            $table->text('account_details')->nullable();
             $table->enum('status', ['pending', 'approved', 'rejected'])->default('pending');
             $table->string('admin_note')->nullable();
             $table->timestamp('processed_at')->nullable();
