@@ -72,16 +72,20 @@ Route::prefix('v1')->group(function () {
         Route::put('profile', [ProfileController::class, 'update']);
         Route::put('profile/password', [ProfileController::class, 'updatePassword']);
         Route::post('profile/avatar', [ProfileController::class, 'uploadAvatar']);
+        Route::post('profile/deactivate', [ProfileController::class, 'deactivate']);
 
         // Two-Factor Authentication
         Route::post('2fa/enable', [TwoFactorController::class, 'enable']);
+        Route::post('2fa/confirm', [TwoFactorController::class, 'confirm']);
         Route::post('2fa/disable', [TwoFactorController::class, 'disable']);
         Route::get('2fa/secret', [TwoFactorController::class, 'getSecret']);
+        Route::post('2fa/recovery-codes', [TwoFactorController::class, 'regenerateRecoveryCodes']);
 
         // Investments
         Route::get('investments', [InvestmentController::class, 'index']);
         Route::post('investments', [InvestmentController::class, 'store']);
         Route::get('investments/{investment}', [InvestmentController::class, 'show']);
+        Route::post('investments/{investment}/cancel', [InvestmentController::class, 'cancel']);
 
         // Wallet
         Route::get('wallet', [WalletController::class, 'show']);
@@ -127,6 +131,8 @@ Route::prefix('v1')->group(function () {
             Route::get('users/{user}', [\App\Http\Controllers\Admin\AdminUserController::class, 'show']);
             Route::put('users/{user}', [\App\Http\Controllers\Admin\AdminUserController::class, 'update']);
             Route::post('users/{user}/toggle-active', [\App\Http\Controllers\Admin\AdminUserController::class, 'toggleActive']);
+            Route::post('users/{user}/impersonate', [\App\Http\Controllers\Admin\AdminUserController::class, 'impersonate']);
+            Route::get('users/{user}/summary', [\App\Http\Controllers\Admin\AdminUserController::class, 'summary']);
 
             Route::get('plans', [\App\Http\Controllers\Admin\AdminPlanController::class, 'index']);
             Route::post('plans', [\App\Http\Controllers\Admin\AdminPlanController::class, 'store']);

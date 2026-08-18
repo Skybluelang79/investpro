@@ -22,6 +22,12 @@ import { User } from '../../core/models';
           <option value="active">Active</option>
           <option value="inactive">Inactive</option>
         </select>
+        <select class="form-control" [(ngModel)]="filterKyc">
+          <option value="">All KYC</option>
+          <option value="pending">Pending</option>
+          <option value="approved">Approved</option>
+          <option value="rejected">Rejected</option>
+        </select>
       </div>
     </div>
 
@@ -84,23 +90,21 @@ export class AdminUsersComponent {
   users: User[] = [];
   searchTerm = '';
   filterRole = '';
+  filterKyc = '';
 
   ngOnInit(): void {
     this.loadUsers();
   }
 
   loadUsers(): void {
-    this.load();
-  }
-
-  load(): void {
-    this.api.get<{ data: User[] }>('/admin/users', { search: this.searchTerm }).subscribe((res) => (this.users = res.data));
+    const params: any = { search: this.searchTerm };
+    if (this.filterRole) params.status = this.filterRole;
+    if (this.filterKyc) params.kyc_status = this.filterKyc;
+    this.api.get<{ data: User[] }>('/admin/users', params).subscribe((res) => (this.users = res.data));
   }
 
   get filteredUsers(): User[] {
-    if (!this.filterRole) return this.users;
-    const isActive = this.filterRole === 'active';
-    return this.users.filter((u) => u.is_active === isActive);
+    return this.users;
   }
 
   viewUser(id: number): void {
@@ -115,7 +119,7 @@ export class AdminUsersComponent {
     this.api.post<{ message: string }>(`/admin/users/${u.id}/toggle-active`).subscribe({
       next: (res: { message: string }) => {
         this.toast.success(res.message);
-        this.load();
+        this.loadUsers();
       },
       error: (err) => this.toast.error(err.error?.message ?? 'Failed.'),
     });

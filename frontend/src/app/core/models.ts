@@ -152,9 +152,30 @@ export interface AdminDashboardData {
   total_users: number;
   pending_deposits: number;
   pending_withdrawals: number;
-  chart: { month: string; deposits: number; withdrawals: number }[];
+  pending_kyc: number;
+  chart: { month: string; deposits: number; withdrawals: number; revenue: number }[];
+  user_growth: { month: string; new_users: number; new_investments: number; new_investment_volume: number }[];
+  plan_performance: {
+    id: number;
+    name: string;
+    interest_rate: number;
+    duration_days: number;
+    is_active: boolean;
+    total_investments: number;
+    active_investments: number;
+    total_volume: number;
+  }[];
   recent_users: User[];
   recent_deposits: Deposit[];
+  recent_investments: any[];
+  system_health: {
+    total_transactions: number;
+    total_completed_deposits: number;
+    total_completed_withdrawals: number;
+    kyc_verified_users: number;
+    active_investments: number;
+    completed_investments: number;
+  };
 }
 
 export interface Paginated<T> {

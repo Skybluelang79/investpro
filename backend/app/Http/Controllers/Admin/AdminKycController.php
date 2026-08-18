@@ -3,10 +3,14 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Mail\KycApprovedMail;
+use App\Mail\KycRejectedMail;
 use App\Models\KycVerification;
 use App\Models\Notification;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class AdminKycController extends Controller
 {
@@ -31,6 +35,13 @@ class AdminKycController extends Controller
             'type' => 'success',
         ]);
 
+        $user = $kyc->user;
+        try {
+            Mail::to($user->email)->send(new KycApprovedMail($user->name));
+        } catch (\Throwable $e) {
+            Log::warning('Failed to send KYC approved email: '.$e->getMessage());
+        }
+
         return response()->json(['message' => 'KYC approved.', 'kyc' => $kyc->fresh()]);
     }
 
@@ -48,6 +59,13 @@ class AdminKycController extends Controller
             'message' => 'Your identity verification was rejected: '.$validated['reason'],
             'type' => 'error',
         ]);
+
+        $user = $kyc->user;
+        try {
+            Mail::to($user->email)->send(new KycRejectedMail($user->name, $validated['reason']));
+        } catch (\Throwable $e) {
+            Log::warning('Failed to send KYC rejected email: '.$e->getMessage());
+        }
 
         return response()->json(['message' => 'KYC rejected.', 'kyc' => $kyc->fresh()]);
     }

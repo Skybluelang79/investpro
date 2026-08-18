@@ -8,6 +8,7 @@ import { ToastsComponent } from '../components/toasts.component';
 import { ThemeToggleComponent } from '../components/theme-toggle.component';
 import { SupportWidgetComponent } from '../components/support-widget.component';
 import { AnnouncementBarComponent } from '../components/announcement-bar.component';
+import { AdvertisementComponent } from '../components/advertisement.component';
 import { LanguageSelectorComponent } from '../components/language-selector.component';
 
 interface NavItem {
@@ -19,7 +20,7 @@ interface NavItem {
 @Component({
   selector: 'app-layout',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive, ToastsComponent, ThemeToggleComponent, SupportWidgetComponent, AnnouncementBarComponent, LanguageSelectorComponent],
+  imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive, ToastsComponent, ThemeToggleComponent, SupportWidgetComponent, AnnouncementBarComponent, AdvertisementComponent, LanguageSelectorComponent],
   template: `
     <div class="shell">
       <aside class="sidebar">
@@ -65,6 +66,9 @@ interface NavItem {
 
         <main class="content">
           <router-outlet />
+          <div class="ad-footer">
+            <app-advertisement position="sidebar" />
+          </div>
         </main>
       </div>
     </div>
@@ -129,6 +133,7 @@ interface NavItem {
     .user-name { font-weight: 600; font-size: 13px; }
     .user-role { color: var(--text-muted); font-size: 11px; text-transform: capitalize; }
     .content { padding: 24px; }
+    .ad-footer { margin-top: 24px; }
     @media (max-width: 768px) {
       .sidebar { display: none; }
     }

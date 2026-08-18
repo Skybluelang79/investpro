@@ -42,6 +42,7 @@ export const routes: Routes = [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       { path: 'dashboard', loadComponent: () => import('./admin/dashboard/admin-dashboard.component').then((m) => m.AdminDashboardComponent) },
       { path: 'users', loadComponent: () => import('./admin/users/admin-users.component').then((m) => m.AdminUsersComponent) },
+      { path: 'users/:id', loadComponent: () => import('./admin/users/admin-user-detail.component').then((m) => m.AdminUserDetailComponent) },
       { path: 'plans', loadComponent: () => import('./admin/plans/admin-plans.component').then((m) => m.AdminPlansComponent) },
       { path: 'investments', loadComponent: () => import('./admin/investments/admin-investments.component').then((m) => m.AdminInvestmentsComponent) },
       { path: 'deposits', loadComponent: () => import('./admin/deposits/admin-deposits.component').then((m) => m.AdminDepositsComponent) },

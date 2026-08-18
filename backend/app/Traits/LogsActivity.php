@@ -19,6 +19,7 @@ trait LogsActivity
             'ip_address' => $request->ip(),
             'user_agent' => $request->userAgent(),
             'metadata' => $metadata,
+            'created_at' => now(),
         ]);
     }
 }

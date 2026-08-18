@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\WelcomeMail;
 use App\Models\Wallet;
 use App\Models\Notification;
 use App\Services\WalletService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use App\Traits\LogsActivity;
 use Illuminate\Validation\ValidationException;
 
@@ -86,6 +88,12 @@ class AuthController extends Controller
 
         $token = $user->createToken('auth')->plainTextToken;
 
+        try {
+            Mail::to($user->email)->send(new WelcomeMail($user->name, $user->referral_code));
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('Failed to send welcome email: '.$e->getMessage());
+        }
+
         return response()->json([
             'message' => 'Account created successfully.',
             'token' => $token,
@@ -112,9 +120,17 @@ class AuthController extends Controller
             return response()->json(['message' => 'Your account has been deactivated. Contact support.'], 403);
         }
 
-        $token = $user->createToken('auth')->plainTextToken;
-
         $this->logActivity('login', 'User logged in', null, $user->id);
+
+        if ($user->two_factor_enabled) {
+            return response()->json([
+                'message' => 'Two-factor authentication required.',
+                'requires_2fa' => true,
+                'email' => $user->email,
+            ]);
+        }
+
+        $token = $user->createToken('auth')->plainTextToken;
 
         return response()->json([
             'message' => 'Logged in successfully.',

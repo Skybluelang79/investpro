@@ -47,8 +47,11 @@ import { Investment, InvestmentPlan } from '../../core/models';
               <td class="mono percent-up">+{{ api.money(inv.total_profit) }}</td>
               <td><span class="badge" [ngClass]="'badge-' + badgeClass(inv.status)">{{ inv.status }}</span></td>
               <td class="small">{{ inv.ends_at ? (inv.ends_at | date: 'mediumDate') : '-' }}</td>
+              <td>
+                <button *ngIf="inv.status === 'active'" class="btn btn-xs btn-danger" (click)="cancelInvestment(inv)">Cancel</button>
+              </td>
             </tr>
-            <tr *ngIf="investments.data.length === 0"><td colspan="7" class="empty">No investments yet.</td></tr>
+            <tr *ngIf="investments.data.length === 0"><td colspan="8" class="empty">No investments yet.</td></tr>
           </tbody>
         </table>
       </div>
@@ -129,5 +132,13 @@ export class InvestmentsComponent {
       case 'completed': return 'success';
       default: return 'danger';
     }
+  }
+
+  cancelInvestment(inv: Investment): void {
+    if (!confirm('Are you sure you want to cancel this investment? Funds will be returned to your wallet.')) return;
+    this.api.post<{ message: string }>(`/investments/${inv.id}/cancel`).subscribe({
+      next: (res) => { this.toast.success(res.message); this.ngOnInit(); },
+      error: (err) => this.toast.error(err.error?.message ?? 'Failed to cancel investment.'),
+    });
   }
 }

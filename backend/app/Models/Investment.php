@@ -38,6 +38,7 @@ class Investment extends Model
 
     public const STATUS_ACTIVE = 'active';
     public const STATUS_COMPLETED = 'completed';
+    public const STATUS_CANCELLED = 'cancelled';
     public const STATUS_REJECTED = 'rejected';
 
     public function user(): \Illuminate\Database\Eloquent\Relations\BelongsTo

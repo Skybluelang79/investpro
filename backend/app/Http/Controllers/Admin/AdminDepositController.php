@@ -3,11 +3,14 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Mail\DepositConfirmedMail;
 use App\Models\Deposit;
 use App\Models\Notification;
 use App\Services\WalletService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class AdminDepositController extends Controller
 {
@@ -51,6 +54,13 @@ class AdminDepositController extends Controller
             'message' => 'Your deposit of '.number_format($deposit->amount, 2).' has been confirmed and credited to your wallet.',
             'type' => 'success',
         ]);
+
+        $user = $deposit->user;
+        try {
+            Mail::to($user->email)->send(new DepositConfirmedMail($user->name, $deposit->amount, $deposit->reference));
+        } catch (\Throwable $e) {
+            Log::warning('Failed to send deposit confirmation email: '.$e->getMessage());
+        }
 
         return response()->json(['message' => 'Deposit approved and wallet credited.', 'deposit' => $deposit->fresh()]);
     }

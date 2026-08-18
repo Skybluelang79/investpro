@@ -6,6 +6,14 @@ import { User } from '../models';
 const TOKEN_KEY = 'investpro_token';
 const USER_KEY = 'investpro_user';
 
+export interface LoginResponse {
+  token?: string;
+  user?: User;
+  requires_2fa?: boolean;
+  email?: string;
+  message?: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private api = inject(ApiService);
@@ -34,8 +42,12 @@ export class AuthService {
     );
   }
 
-  login(email: string, password: string): Observable<{ token: string; user: User }> {
-    return this.api.post<{ token: string; user: User }>('/login', { email, password }).pipe(
+  login(email: string, password: string): Observable<LoginResponse> {
+    return this.api.post<LoginResponse>('/login', { email, password });
+  }
+
+  verify2FA(email: string, code: string): Observable<{ token: string; user: User }> {
+    return this.api.post<{ token: string; user: User }>('/2fa/verify', { email, code }).pipe(
       tap((res) => this.setSession(res.token, res.user)),
     );
   }

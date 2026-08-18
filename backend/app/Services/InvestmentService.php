@@ -2,10 +2,13 @@
 
 namespace App\Services;
 
+use App\Mail\InvestmentMaturedMail;
 use App\Models\Investment;
 use App\Models\InvestmentPlan;
 use App\Models\Notification;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class InvestmentService
 {
@@ -106,6 +109,18 @@ class InvestmentService
                     'message' => "Investment {$investment->reference} matured. Principal ".number_format($investment->amount, 2).' credited to your wallet.',
                     'type' => 'success',
                 ]);
+
+                $user = $investment->user;
+                try {
+                    Mail::to($user->email)->send(new InvestmentMaturedMail(
+                        $user->name,
+                        $investment->reference,
+                        $investment->amount,
+                        $investment->total_profit
+                    ));
+                } catch (\Throwable $e) {
+                    Log::warning('Failed to send investment matured email: '.$e->getMessage());
+                }
             } else {
                 $this->walletService->credit(
                     $investment->user_id,

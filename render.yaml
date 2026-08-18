@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: investpro-backend
+    name: ZenithCore
     runtime: php
     rootDir: backend
     plan: free

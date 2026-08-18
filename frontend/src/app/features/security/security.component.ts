@@ -17,8 +17,8 @@ import { User } from '../../core/models';
       <div>
         <div class="card mb-2">
           <h3 class="section-title mb-2">Two-Factor Authentication</h3>
-          <p class="muted small mb-2" *ngIf="!user?.two_factor_enabled">Add an extra layer of security to your account by enabling two-factor authentication.</p>
-          <p class="muted small mb-2" *ngIf="user?.two_factor_enabled">Two-factor authentication is currently <strong class="percent-up">enabled</strong>.</p>
+          <p class="muted small mb-2" *ngIf="!user?.two_factor_enabled">Add an extra layer of security to your account.</p>
+          <p class="muted small mb-2" *ngIf="user?.two_factor_enabled">Two-factor authentication is <strong class="percent-up">enabled</strong>.</p>
 
           <div *ngIf="!enabling2fa && !user?.two_factor_enabled">
             <button class="btn btn-primary" (click)="startEnable2fa()">Enable 2FA</button>
@@ -45,8 +45,32 @@ import { User } from '../../core/models';
             </div>
           </div>
 
-          <div *ngIf="user?.two_factor_enabled && !disabling2fa">
-            <button class="btn btn-danger" (click)="disabling2fa = true">Disable 2FA</button>
+          <div *ngIf="recoveryCodes.length > 0 && !enabling2fa" class="recovery-box mt-1">
+            <p class="small" style="font-weight:700;margin-bottom:6px;">Recovery Codes</p>
+            <p class="muted small mb-1">Save these codes. Each can be used once if you lose access to your authenticator.</p>
+            <div class="codes-grid">
+              <span class="code" *ngFor="let code of recoveryCodes">{{ code }}</span>
+            </div>
+            <p class="muted small mt-1" style="font-style:italic">Shown once. Store them safely.</p>
+          </div>
+
+          <div *ngIf="user?.two_factor_enabled && !disabling2fa" class="mt-1">
+            <button class="btn btn-outline" (click)="showRecovery = !showRecovery">
+              {{ showRecovery ? 'Hide Recovery Codes' : 'View Recovery Codes' }}
+            </button>
+            <div *ngIf="showRecovery" class="mt-1">
+              <div class="field">
+                <label>Enter 6-digit code to view</label>
+                <input class="input mono" type="text" [(ngModel)]="recoveryViewCode" name="recoveryViewCode" placeholder="000000" maxlength="6" />
+              </div>
+              <button class="btn btn-sm btn-outline" (click)="viewRecoveryCodes()" [disabled]="!recoveryViewCode || saving2fa">Show Codes</button>
+              <div *ngIf="recoveryCodes.length > 0" class="recovery-box mt-1">
+                <div class="codes-grid">
+                  <span class="code" *ngFor="let code of recoveryCodes">{{ code }}</span>
+                </div>
+              </div>
+            </div>
+            <button class="btn btn-danger mt-1" (click)="disabling2fa = true">Disable 2FA</button>
           </div>
 
           <div *ngIf="disabling2fa" class="mt-1">
@@ -93,6 +117,9 @@ import { User } from '../../core/models';
     .qr-img { width: 180px; height: 180px; }
     .btn-row { display: flex; justify-content: flex-end; gap: 10px; margin-top: 8px; }
     .btn-danger { background: var(--danger, #e53e3e); color: #fff; }
+    .recovery-box { background: var(--bg); border-radius: 10px; padding: 14px; }
+    .codes-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; }
+    .code { font-family: monospace; font-size: 13px; background: var(--card-bg); border: 1px solid var(--card-border); padding: 4px 8px; border-radius: 6px; text-align: center; }
   `],
 })
 export class SecurityComponent {
@@ -103,10 +130,13 @@ export class SecurityComponent {
   user?: User | null;
   enabling2fa = false;
   disabling2fa = false;
+  showRecovery = false;
   qrUrl = '';
   secret = '';
   verifyCode = '';
   disableCode = '';
+  recoveryViewCode = '';
+  recoveryCodes: string[] = [];
   saving2fa = false;
 
   pw = { current: '', new: '', confirm: '' };
@@ -118,10 +148,11 @@ export class SecurityComponent {
   }
 
   startEnable2fa(): void {
-    this.api.get<{ qr_url: string; secret: string }>('/2fa/secret').subscribe({
+    this.api.post<{ secret: string; qr_code_url: string; recovery_codes: string[] }>('/2fa/enable', {}).subscribe({
       next: (res) => {
-        this.qrUrl = res.qr_url;
+        this.qrUrl = res.qr_code_url;
         this.secret = res.secret;
+        this.recoveryCodes = res.recovery_codes;
         this.enabling2fa = true;
       },
       error: (err) => {
@@ -139,9 +170,10 @@ export class SecurityComponent {
 
   confirmEnable(): void {
     this.saving2fa = true;
-    this.api.post<{ message: string }>('/2fa/enable', { code: this.verifyCode }).subscribe({
+    this.api.post<{ message: string; recovery_codes: string[] }>('/2fa/confirm', { code: this.verifyCode }).subscribe({
       next: (res) => {
         this.toast.success(res.message);
+        this.recoveryCodes = res.recovery_codes;
         this.enabling2fa = false;
         this.verifyCode = '';
         this.saving2fa = false;
@@ -155,6 +187,19 @@ export class SecurityComponent {
     });
   }
 
+  viewRecoveryCodes(): void {
+    this.api.get<{ recovery_codes: string[] }>('/2fa/secret').subscribe({
+      next: (res) => {
+        this.recoveryCodes = res.recovery_codes ?? [];
+        this.recoveryViewCode = '';
+        if (!this.recoveryCodes.length) {
+          this.toast.error('No recovery codes found. Regenerate them.');
+        }
+      },
+      error: () => this.toast.error('Failed to load recovery codes.'),
+    });
+  }
+
   disable2fa(): void {
     this.saving2fa = true;
     this.api.post<{ message: string }>('/2fa/disable', { code: this.disableCode }).subscribe({
@@ -162,6 +207,7 @@ export class SecurityComponent {
         this.toast.success(res.message);
         this.disabling2fa = false;
         this.disableCode = '';
+        this.recoveryCodes = [];
         this.saving2fa = false;
         this.user = { ...this.user!, two_factor_enabled: false } as User;
         this.auth.me().subscribe();

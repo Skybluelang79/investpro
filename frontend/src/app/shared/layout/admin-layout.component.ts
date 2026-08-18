@@ -105,6 +105,8 @@ export class AdminLayoutComponent {
     { label: 'Withdrawals', route: '/admin/withdrawals', icon: '&#10134;' },
     { label: 'KYC Reviews', route: '/admin/kyc', icon: '&#10003;' },
     { label: 'Reports', route: '/admin/reports', icon: '&#128202;' },
+    { label: 'Announcements', route: '/admin/announcements', icon: '&#128227;' },
+    { label: 'Advertisements', route: '/admin/advertisements', icon: '&#128444;' },
   ];
 
   logout(): void {

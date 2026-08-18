@@ -3,11 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\KycVerification;
+use App\Traits\LogsActivity;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class KycController extends Controller
 {
+    use LogsActivity;
+
     public function show(Request $request): JsonResponse
     {
         $kyc = $request->user()->kyc;
@@ -46,6 +49,12 @@ class KycController extends Controller
         }
 
         $kyc = KycVerification::updateOrCreate(['user_id' => $user->id], $data);
+
+        $this->logActivity(
+            'kyc_submitted',
+            "KYC submitted with document type: {$validated['document_type']}",
+            ['kyc_id' => $kyc->id, 'document_type' => $validated['document_type']]
+        );
 
         return response()->json([
             'message' => 'KYC submitted for review.',
