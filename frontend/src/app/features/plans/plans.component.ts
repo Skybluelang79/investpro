@@ -40,7 +40,7 @@ import { InvestmentPlan } from '../../core/models';
 
         <div class="field">
           <label>Amount (min {{ api.money(selected.min_amount) }})</label>
-          <input class="input mono" type="number" [(ngModel)]="amount" name="amount" [min]="selected.min_amount" [max]="selected.max_amount ?? undefined" />
+          <input class="input mono" type="number" [(ngModel)]="amount" name="amount" [min]="selected.min_amount" [max]="selected.max_amount ?? 999999" />
         </div>
 
         <div class="return-preview" *ngIf="amount && amount >= selected.min_amount">

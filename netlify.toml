@@ -1,0 +1,9 @@
+[build]
+  base = "frontend"
+  publish = "dist/investpro-frontend/browser"
+  command = "npm install && node -e \"const fs=require('fs');let c=fs.readFileSync('src/environments/environment.prod.ts','utf8');c=c.replace('%%API_URL%%',process.env.API_URL||'https://investpro-backend.onrender.com/api/v1');fs.writeFileSync('src/environments/environment.prod.ts',c)\" && npm run build"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
