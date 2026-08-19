@@ -39,7 +39,11 @@ Thumbs.db
 *.swp
 
 # Netlify local
+.netlify/
 frontend/.netlify/
 
-# GitHub workflows (no workflow scope in token)
+# GitHub workflows
 .github/workflows/
+
+# Database
+backend/database/database.sqlite

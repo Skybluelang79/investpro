@@ -44,10 +44,9 @@ class DashboardController extends Controller
 
         $investmentData = $user->investments()
             ->where('created_at', '>=', $sixMonthsAgo)
-            ->toBase()
-            ->selectRaw("strftime('%Y-%m', created_at) as month_key, SUM(current_value) as total_value")
-            ->groupBy('month_key')
-            ->pluck('total_value', 'month_key');
+            ->get()
+            ->groupBy(fn ($inv) => $inv->created_at->format('Y-m'))
+            ->map(fn ($group) => (float) $group->sum('current_value'));
 
         $chart = collect(range(5, 0))->map(function ($i) use ($investmentData) {
             $month = now()->subMonths($i);
@@ -55,24 +54,22 @@ class DashboardController extends Controller
 
             return [
                 'month' => $month->format('M'),
-                'value' => (float) ($investmentData[$key] ?? 0),
+                'value' => $investmentData[$key] ?? 0,
             ];
         });
 
         $referralData = $user->referrals()
             ->where('created_at', '>=', $sixMonthsAgo)
-            ->toBase()
-            ->selectRaw("strftime('%Y-%m', created_at) as month_key, COUNT(*) as cnt")
-            ->groupBy('month_key')
-            ->pluck('cnt', 'month_key');
+            ->get()
+            ->groupBy(fn ($r) => $r->created_at->format('Y-m'))
+            ->map(fn ($group) => $group->count());
 
         $bonusData = $user->transactions()
             ->where('type', Transaction::TYPE_BONUS)
             ->where('created_at', '>=', $sixMonthsAgo)
-            ->toBase()
-            ->selectRaw("strftime('%Y-%m', created_at) as month_key, SUM(amount) as total")
-            ->groupBy('month_key')
-            ->pluck('total', 'month_key');
+            ->get()
+            ->groupBy(fn ($t) => $t->created_at->format('Y-m'))
+            ->map(fn ($group) => (float) $group->sum('amount'));
 
         $referralChart = collect(range(5, 0))->map(function ($i) use ($referralData, $bonusData) {
             $month = now()->subMonths($i);
@@ -80,8 +77,8 @@ class DashboardController extends Controller
 
             return [
                 'month' => $month->format('M'),
-                'referrals' => (int) ($referralData[$key] ?? 0),
-                'bonus' => (float) ($bonusData[$key] ?? 0),
+                'referrals' => $referralData[$key] ?? 0,
+                'bonus' => $bonusData[$key] ?? 0,
             ];
         });
 
