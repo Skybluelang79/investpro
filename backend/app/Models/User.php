@@ -15,11 +15,6 @@ class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
 
-    protected $appends = [
-        'referrals_count',
-        'referral_bonus_total',
-    ];
-
     protected $fillable = [
         'name',
         'email',

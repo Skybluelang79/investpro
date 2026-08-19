@@ -35,6 +35,6 @@ class InvestmentPlan extends Model
 
     public function investments(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
-        return $this->hasMany(Investment::class);
+        return $this->hasMany(Investment::class, 'plan_id');
     }
 }

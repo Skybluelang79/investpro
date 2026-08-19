@@ -10,6 +10,7 @@
         "darkaonline/l5-swagger": "*",
         "laravel/framework": "^11.0",
         "laravel/sanctum": "^4.0",
+        "laravel/socialite": "^5.30",
         "pragmarx/google2fa-laravel": "^3.0"
     },
     "require-dev": {

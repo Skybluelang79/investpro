@@ -40,39 +40,56 @@ class DashboardController extends Controller
             ->limit(5)
             ->get();
 
-        $chart = collect(range(5, 0))->map(function ($i) use ($user) {
+        $sixMonthsAgo = now()->subMonths(5)->startOfMonth();
+
+        $investmentData = $user->investments()
+            ->where('created_at', '>=', $sixMonthsAgo)
+            ->toBase()
+            ->selectRaw("strftime('%Y-%m', created_at) as month_key, SUM(current_value) as total_value")
+            ->groupBy('month_key')
+            ->pluck('total_value', 'month_key');
+
+        $chart = collect(range(5, 0))->map(function ($i) use ($investmentData) {
             $month = now()->subMonths($i);
+            $key = $month->format('Y-m');
 
             return [
                 'month' => $month->format('M'),
-                'value' => (float) $user->investments()
-                    ->where('created_at', '<=', $month->endOfMonth())
-                    ->sum('current_value'),
+                'value' => (float) ($investmentData[$key] ?? 0),
             ];
         });
 
-        $referralChart = collect(range(5, 0))->map(function ($i) use ($user) {
+        $referralData = $user->referrals()
+            ->where('created_at', '>=', $sixMonthsAgo)
+            ->toBase()
+            ->selectRaw("strftime('%Y-%m', created_at) as month_key, COUNT(*) as cnt")
+            ->groupBy('month_key')
+            ->pluck('cnt', 'month_key');
+
+        $bonusData = $user->transactions()
+            ->where('type', Transaction::TYPE_BONUS)
+            ->where('created_at', '>=', $sixMonthsAgo)
+            ->toBase()
+            ->selectRaw("strftime('%Y-%m', created_at) as month_key, SUM(amount) as total")
+            ->groupBy('month_key')
+            ->pluck('total', 'month_key');
+
+        $referralChart = collect(range(5, 0))->map(function ($i) use ($referralData, $bonusData) {
             $month = now()->subMonths($i);
-            $start = $month->copy()->startOfMonth();
-            $end = $month->copy()->endOfMonth();
+            $key = $month->format('Y-m');
 
             return [
                 'month' => $month->format('M'),
-                'referrals' => (int) $user->referrals()
-                    ->whereBetween('created_at', [$start, $end])
-                    ->count(),
-                'bonus' => (float) $user->transactions()
-                    ->where('type', Transaction::TYPE_BONUS)
-                    ->whereBetween('created_at', [$start, $end])
-                    ->sum('amount'),
+                'referrals' => (int) ($referralData[$key] ?? 0),
+                'bonus' => (float) ($bonusData[$key] ?? 0),
             ];
         });
 
         return response()->json([
             'wallet' => $user->wallet,
             'bonus_balance' => (float) ($user->wallet?->bonus ?? 0),
-            'referral_bonus_earned' => (float) $user->referral_bonus_total,
-            'referrals_count' => $user->referrals_count,
+            'referral_bonus_earned' => (float) $user->transactions()->where('type', Transaction::TYPE_BONUS)->sum('amount'),
+            'referrals_count' => $user->referrals()->count(),
             'referral_code' => $user->referral_code,
             'referral_chart' => $referralChart,
             'total_balance' => (float) ($user->wallet?->balance ?? 0),

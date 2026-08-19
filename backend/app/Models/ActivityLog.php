@@ -16,6 +16,7 @@ class ActivityLog extends Model
         'ip_address',
         'user_agent',
         'metadata',
+        'created_at',
     ];
 
     protected $casts = [
