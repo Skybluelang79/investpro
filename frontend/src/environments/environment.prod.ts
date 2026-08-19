@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiBaseUrl: 'https://investpro-backend.onrender.com/api/v1',
+  apiBaseUrl: 'https://investpro-api-u3kj.onrender.com/api/v1',
 };
