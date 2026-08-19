@@ -5,8 +5,10 @@ RUN apk add --no-cache \
         oniguruma-dev \
         libzip-dev \
         icu-dev \
+        libpq-dev \
     && docker-php-ext-install \
         pdo_mysql \
+        pdo_pgsql \
         mbstring \
         bcmath \
         pcntl \
@@ -33,4 +35,4 @@ RUN mkdir -p \
 
 EXPOSE 8000
 
-CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
+CMD php artisan key:generate --force && php artisan migrate --force --seed && php artisan storage:link 2>/dev/null; php artisan serve --host=0.0.0.0 --port=8000
