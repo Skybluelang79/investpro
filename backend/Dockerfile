@@ -22,7 +22,8 @@ WORKDIR /var/www
 
 COPY . .
 
-RUN mkdir -p \
+RUN chmod +x docker-entrypoint.sh \
+    && mkdir -p \
         storage/app/public \
         storage/framework/cache/data \
         storage/framework/sessions \
@@ -35,4 +36,4 @@ RUN mkdir -p \
 
 EXPOSE 8000
 
-CMD php artisan key:generate --force && php artisan migrate --force --seed && php artisan storage:link 2>/dev/null; php artisan serve --host=0.0.0.0 --port=8000
+CMD ["./docker-entrypoint.sh"]
